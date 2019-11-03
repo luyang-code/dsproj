@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>首页</title>
+		<link rel="stylesheet" type="text/css" href="../assets/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/css/bootstrap-grid.min.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/css/bootstrap-reboot.css" />
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			div#body {
+				width: 75%;
+				margin:100px auto;
+			}
+			
+			.site-nav {
+				font-size: 15px;
+				width: 100%;
+				margin: 0 auto;
+				padding-top: 2px;
+				height: 32px;
+				background-color: #f2f2f2;
+			}
+			
+			.site-nav .site-nav-bd {
+				padding: 0 200px;
+			}
+			
+			.site-nav .site-nav-bd .sn-bd-r ul {
+				list-style: none;
+				position: absolute;
+				right: 200px;
+				top: 2px;
+			}
+			
+			.site-nav .site-nav-bd .sn-bd-r li {
+				float: left;
+				margin: 0 10px;
+			}
+			
+			.site-nav .site-nav-bd .sn-bd-r a {
+				color: #999;
+			}
+			
+			.site-nav .site-nav-bd .sn-bd-r a:hover {
+				color: #007bff;
+				text-decoration: none;
+			}
+			input{
+				border-radius: 20px !important;
+			}
+			button{
+				border-radius: 10px !important;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="site-nav">
+			<div class="site-nav-bd">
+				<div class="sn-bd-l">
+					<em style="font-style: normal;color: #999;">欢迎来到MapleMall！</em>
+				</div>
+				<div class="sn-bd-r">
+					<ul class="snb-quick-menu">
+						<li>
+							<a href="#">个人中心</a>
+						</li>
+						<li>
+							<a href="../Admin/adminList.do">用户管理</a>
+						</li>
+						<li>
+							<a href="../Admin/logout.do">注销登录</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="body">
+			<ul class="nav nav-tabs nav-fill">
+				<li class="nav-item">
+					<a class="nav-link active" href="../Order/OrderIndex.do">订单管理</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="../User/userList.do">会员管理</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="../Goods/goodsList.do">商品管理</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="../GoodsType/goodsTypeList.do">商品类别管理</a>
+				</li>
+			</ul>
+
+            <div class="text-center mb-4" style="margin-top: 10px">
+                <h1 class="h3 mb-3 font-weight-normal">订单信息</h1>
+                <p></p>
+            </div>
+            <form action="../Order/findOrder.do" method="post" id="findForm">
+                <div class="input-group mb-3" style="display: flex;">
+                    <input type="text" name="content" class="form-control" autocomplete="off" placeholder="输入订单号或商品名称查询" aria-label="Recipient's username" aria-describedby="button-search">
+                    <div class="input-group-append" style="display: flex;margin-left: 10px;">
+                        <button class="btn btn-primary" type="submit" type="button" id="button-search" style="margin-right: 10px;">查询</button>
+                    </div>
+
+                </div>
+            </form>
+
+            <table class="table" id="dataTable" style='vertical-align: middle;text-align: center;'>
+                <thead>
+                <tr>
+                    <th scope="col">订单编号</th>
+                    <th scope="col">商品名称</th>
+                    <th scope="col">商品数量</th>
+                    <th scope="col">单价</th>
+                    <th scope="col">合计金额</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+		</div>
+
+		<script src="../assets/js/jquery.js"></script>
+		<script src="../assets/js/bootstrap.min.js"></script>
+		<script src="../assets/js/my.js"></script>
+	<script>
+        $(function(){
+            /* $(".mb-4").click(function(){
+                //$(".alert.alert-success").show().delay(3000).fadeOut();
+                $(".alert.alert-danger").show().delay(3000).fadeOut();
+            }); */
+
+
+            $.ajax({
+                url: "../Order/findAllOrders.do",	//请求路径
+                dataType: "json",  //响应的类型 json
+                success: function(response){
+                    doRes(response)
+				}
+            });
+        });
+
+        function doRes(response){	//当响应成功时回调，response响应数据
+            //遍历 response, i索引，e当前元素
+            let count=0;
+            let flag=0;
+            let goodsCount=0;
+            let totalPriceCount=0;
+            $.each(response,function(i,e){
+                let sum=0;
+                $.each(response,function (j,item) {
+                    if(item.orderNum==e.orderNum){
+                        sum++;
+                    }
+                });
+                //添加单号行
+                if(flag==0){
+                    $(".table tbody").append("<tr align='left' style='font-size:13px'><td>订单日期：20"+e.orderNum.substr(0,2)+"年"+e.orderNum.substr(2,2)+"月"+e.orderNum.substr(4,2)+"日"+"</td></tr>");
+                    let strTrContent = [
+                        '<td scope="row"  style="vertical-align:middle" rowspan="',sum,'">', e.orderNum, '</td>',
+                        '<td>',e.orderGoods.goodsName,'</td>',
+                        '<td>',e.orderGoodsCount,'</td>',
+                        '<td>￥',e.orderGoods.goodsPrice,'</td>',
+                        '<td>￥',e.totalPrice,'</td>'
+                    ]
+                    let $tr = $('<tr>'+strTrContent.join('')+'</tr>')
+                    //在tbody内部 后面追加
+                    $(".table tbody").append($tr);
+                    count++;
+
+                    flag=1;
+                }else{
+                    let strTrContent = [
+                        '<td>',e.orderGoods.goodsName,'</td>',
+                        '<td>',e.orderGoodsCount,'</td>',
+                        '<td>￥',e.orderGoods.goodsPrice,'</td>',
+                        '<td>￥',e.totalPrice,'</td>'
+                    ]
+                    let $tr = $('<tr>'+strTrContent.join('')+'</tr>')
+                    //在tbody内部 后面追加
+                    $(".table tbody").append($tr);
+                    count++;
+                }
+                goodsCount+=Number(e.orderGoodsCount);
+                totalPriceCount+=Number(e.totalPrice);
+                if(count==sum){
+                    let total = [
+                        '<td scope="row">总计</td>',
+                        '<td></td>',
+                        '<td>',goodsCount,'</td>',
+                        '<td></td>',
+                        '<td>￥',totalPriceCount.toFixed(2),'</td>'
+                    ]
+                    let $total = $('<tr class="table-info">'+total.join('')+'</tr>')
+                    //在tbody内部 后面追加
+                    $(".table tbody").append($total);
+                    count=0;
+                    flag=0;
+                    goodsCount=0;
+                    totalPriceCount=0;
+                }
+
+            });
+
+        }
+	</script>
+
+		<script src="../assets/js/jquery.form.js"></script>
+		<script type="text/javascript">
+            $(function(){
+                /** 验证文件是否导入成功  */
+                $("#findForm").ajaxForm(function(data) {
+                    if (data != "") {
+                        $(".table tbody").html("");
+                        doRes(data)
+                    }else{
+                        alert("无搜索结果！")
+                    }
+                });
+            });
+
+		</script>
+	</body>
+
+</html>

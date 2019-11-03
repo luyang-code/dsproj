@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maple.MapleMall.dao.IGoodsDao">
+    <resultMap id="GoodsMap" type="Goods">
+        <id column="goodsId" property="goodsId"/>
+        <result column="goodsNum" property="goodsNum"/>
+        <result column="goodsName" property="goodsName"/>
+        <result column="goodsType" property="goodsType"/>
+        <result column="goodsPrice" property="goodsPrice"/>
+        <result column="goodsDel" property="goodsDel"/>
+        <result column="goodsRE" property="goodsRE"/>
+    </resultMap>
+
+    <resultMap id="GoodsAndGoodsTypeMap" type="Goods" extends="GoodsMap">
+        <association property="goodsTypeObject" javaType="GoodsType">
+            <id column="goodsTypeId" property="goodsTypeId"/>
+            <result column="goodsTypeNum" property="goodsTypeNum"/>
+            <result column="goodsTypeName" property="goodsTypeName"/>
+            <result column="goodsTypeDel" property="goodsTypeDel"/>
+            <result column="goodsTypeRE" property="goodsTypeRE"/>
+        </association>
+    </resultMap>
+
+    <select id="findGoodsByName" resultMap="GoodsAndGoodsTypeMap" parameterType="String">
+        select * from t_goods g,t_goodstype gt
+        where g.goodsType=gt.goodsTypeNum and goodsTypeDel=0 and goodsDel=0
+        and goodsName like concat('%',#{goodsName},'%')
+    </select>
+    <select id="findGoodsByNum" resultMap="GoodsAndGoodsTypeMap" parameterType="String">
+        select * from t_goods g,t_goodstype gt
+        where g.goodsType=gt.goodsTypeNum and goodsTypeDel=0 and goodsDel=0
+        and goodsNum like concat('%',#{goodsNum},'%')
+    </select>
+    <select id="findByType" resultMap="GoodsAndGoodsTypeMap" parameterType="String">
+        select * from t_goods g,t_goodstype gt
+        where g.goodsType=gt.goodsTypeNum and goodsTypeDel=0 and goodsDel=0
+        and goodsTypeName like concat('%',#{goodsTypeName},'%')
+    </select>
+    <select id="findGoodsAll" resultMap="GoodsAndGoodsTypeMap" parameterType="String">
+        select * from t_goods g,t_goodstype gt
+        where g.goodsType=gt.goodsTypeNum and goodsTypeDel=0 and goodsDel=0
+    </select>
+
+    <select id="findGoodsByNumAndName" resultMap="GoodsAndGoodsTypeMap" parameterType="map">
+        select * from t_goods g,t_goodstype gt
+        where g.goodsType=gt.goodsTypeNum and goodsTypeDel=0 and goodsDel=0
+          and goodsName like concat('%',#{goodsName},'%') and goodsTypeName like concat('%',#{goodsTypeName},'%')
+    </select>
+
+    <select id="findMaxNum" resultType="String" parameterType="String">
+        select goodsNum from t_goods where goodsDel=0
+        and goodsId=(select max(goodsId) from t_goods where goodsDel=0)
+    </select>
+
+    <update id="addGoods" parameterType="Goods">
+        insert into t_goods(goodsNum,goodsName,goodsType,goodsPrice,goodsDel)
+            value (#{goodsNum},#{goodsName},#{goodsType},#{goodsPrice},#{goodsDel})
+    </update>
+
+    <update id="deleteGoods" parameterType="String">
+        update t_goods set goodsDel=1 where goodsDel=0
+        and goodsNum=#{goodsNum}
+    </update>
+    <update id="updateByNum" parameterType="map">
+        update t_goods set goodsPrice=#{goodsPrice},goodsName=#{goodsName},goodsType=#{goodsType} where goodsDel=0
+        and goodsNum=#{goodsNum}
+    </update>
+
+    <select id="findType" resultMap="GoodsAndGoodsTypeMap" parameterType="String">
+        select distinct goodsTypeName from t_goods g,t_goodstype gt
+        where g.goodsType=gt.goodsTypeNum and goodsTypeDel=0 and goodsDel=0
+    </select>
+
+</mapper>

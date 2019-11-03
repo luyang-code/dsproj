@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	namespace 访问的路径
+	select 查询操作
+	selectTAdminByID 自定义的访问名
+	parameterType 传参类型
+	resultType 返回类型 对应了 config.xml中<typeAlias>
+	要执行的SQL语句
+ -->
+<mapper namespace="com.maple.MapleMall.dao.IAdminDao">
+    <resultMap type="Admin" id="adminMap">
+        <id column="adminId" property="adminId"/>
+        <result column="adminNum" property="adminNum"/>
+        <result column="adminName" property="adminName"/>
+        <result column="adminPassword" property="adminPassword"/>
+        <result column="adminDel" property="adminDel"/>
+    </resultMap>
+
+    <select id="getMaxId" resultType="String">
+        SELECT adminNum from t_admin where adminId=(SELECT max(adminId) from t_admin where adminDel=0)
+    </select>
+
+    <select id="findAdminByName" parameterType="String" resultMap="adminMap">
+        SELECT * from t_admin where adminName like concat('%',#{adminName},'%') and adminDel=0
+    </select>
+
+    <select id="findAdminByNum" parameterType="String" resultMap="adminMap">
+        SELECT * from t_admin where adminNum like concat('%',#{adminNum},'%') and adminDel=0
+    </select>
+
+    <select id="getDBAdmin" parameterType="String" resultMap="adminMap">
+        SELECT * from t_admin where adminName=#{adminName} and adminDel=0
+    </select>
+
+    <update id="addAdmin" parameterType="Admin" >
+        insert into t_admin
+        VALUES(
+                  DEFAULT,#{adminNum},#{adminName},#{adminPassword},0,NULL
+              )
+    </update>
+
+    <update id="deleteAdmin" parameterType="String">
+        UPDATE t_admin set adminDel=1 where adminNum=#{adminNum} and adminDel=0
+    </update>
+
+    <update id="updateAdmin" parameterType="Admin">
+        UPDATE t_admin set adminPassword=#{adminPassword} where adminName=#{adminName} and adminDel=0
+    </update>
+
+    <select id="findAllAdmin" resultMap="adminMap">
+        select * from t_admin where adminDel=0
+    </select>
+
+
+
+</mapper>

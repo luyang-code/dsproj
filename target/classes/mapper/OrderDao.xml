@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	namespace 访问的路径
+	select 查询操作
+	selectTUserByID 自定义的访问名
+	parameterType 传参类型
+	resultType 返回类型 对应了 config.xml中<typeAlias>
+	要执行的SQL语句
+ -->
+<mapper namespace="com.maple.MapleMall.dao.IOrderDao">
+    <resultMap type="Order" id="orderMap">
+        <id column="orderId" property="orderId"/>
+        <result column="orderNum" property="orderNum"/>
+        <result column="orderGoodsName" property="orderGoodsName"/>
+        <result column="orderGoodsCount" property="orderGoodsCount"/>
+        <result column="orderDel" property="orderDel"/>
+    </resultMap>
+
+    <resultMap id="orderGoodsMap" type="Order" extends="orderMap">
+        <collection property="orderGoods" ofType="Goods">
+            <id column="goodsId" property="goodsId"/>
+            <result column="goodsNum" property="goodsNum"/>
+            <result column="goodsName" property="goodsName"/>
+            <result column="goodsPrice" property="goodsPrice"/>
+        </collection>
+    </resultMap>
+
+
+    <select id="findAllOrders" resultMap="orderGoodsMap">
+        select * from t_order o,t_goods g where orderDel=0 and o.orderGoodsName=g.goodsNum
+    </select>
+
+    <select id="findOrderByOrderNum" resultMap="orderGoodsMap" parameterType="String">
+        select * from t_order o,t_goods g where orderDel=0 and o.orderGoodsName=g.goodsNum and o.orderNum like concat('%',#{orderNum},'%')
+    </select>
+
+    <select id="findOrderByGoodsName" resultMap="orderGoodsMap" parameterType="String">
+        select * from t_order o,t_goods g where orderDel=0 and o.orderGoodsName=g.goodsNum and g.goodsName like concat('%',#{goodsName},'%')
+    </select>
+
+</mapper>

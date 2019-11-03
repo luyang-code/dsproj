@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>用户管理</title>
+		<link rel="stylesheet" type="text/css" href="../assets/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/css/bootstrap-grid.min.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/css/bootstrap-reboot.css" />
+		<link rel="stylesheet" type="text/css" href="../assets/font-awesome/css/font-awesome.css">
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			
+			div#body {
+				width: 75%;
+				margin:100px auto;
+			}
+			table#dataTable{
+				margin:20px auto;
+			}
+
+			.del{
+				margin-left: 10px;
+			}
+
+			.site-nav {
+				font-size: 15px;
+				width: 100%;
+				margin: 0 auto;
+				padding-top: 2px;
+				height: 32px;
+				background-color: #f2f2f2;
+			}
+			
+			.site-nav .site-nav-bd {
+				padding: 0 200px;
+			}
+			
+			.site-nav .site-nav-bd .sn-bd-r ul {
+				list-style: none;
+				position: absolute;
+				right: 200px;
+				top: 2px;
+			}
+			
+			.site-nav .site-nav-bd .sn-bd-r li {
+				float: left;
+				margin: 0 10px;
+			}
+			
+			.site-nav .site-nav-bd .sn-bd-r a {
+				color: #999;
+			}
+			
+			.site-nav .site-nav-bd .sn-bd-r a:hover {
+				color: #007bff;
+				text-decoration: none;
+			}
+		</style>
+		<style>
+			.alert.alert-success, .alert.alert-danger {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				text-align: center;
+			}
+		</style>
+		<style>
+			input{
+				border-radius: 20px !important;
+			}
+			button{
+				border-radius: 10px !important;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="site-nav">
+			<div class="site-nav-bd">
+				<div class="sn-bd-l">
+					<em style="font-style: normal;color: #999;">欢迎来到MapleMall！</em>
+				</div>
+				<div class="sn-bd-r">
+					<ul class="snb-quick-menu">
+						<li>
+							<a href="#">个人中心</a>
+						</li>
+						<li>
+							<a href="../Admin/adminList.do">用户管理</a>
+						</li>
+						<li>
+							<a href="../Admin/logout.do">注销登录</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="alert alert-success">
+			<strong>删除成功!</strong>
+		</div>
+
+		 <div class="alert alert-danger">
+           <strong>删除失败!</strong>
+         </div>
+		<div id="body">
+			<ul class="nav nav-tabs nav-fill">
+				<li class="nav-item">
+					<a class="nav-link" href="../Order/OrderIndex.do">订单管理</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="../User/userList.do">会员管理</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="../Goods/goodsList.do">商品管理</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="../GoodsType/goodsTypeList.do">商品类别管理</a>
+				</li>
+			</ul>
+			<div class="text-center mb-4" style="margin-top: 10px">
+				<h1 class="h3 mb-3 font-weight-normal">用户信息</h1>
+				<p></p>
+			</div>
+						<form action="../Admin/findAdmin.do" method="post" id="findForm">
+				<div class="input-group mb-3" style="display: flex;">
+						<input type="text" name="content" class="form-control" autocomplete="off" placeholder="输入用户编号或用户名" aria-label="Recipient's username" aria-describedby="button-search">
+						<div class="input-group-append" style="display: flex;margin-left: 10px;">
+							<button class="btn btn-primary" type="submit" type="button" id="button-search" style="margin-right: 10px;">查询</button>
+							<button class="btn btn-primary" data-toggle="modal" data-target="#addAdminModal">添加新用户</button>
+						</div>
+
+				</div>
+				</form>
+			<table class="table table-hover" id="dataTable" style='vertical-align: middle;text-align: center;'>
+				<thead>
+				<tr>
+					<th scope="col">编号</th>
+					<th scope="col">用户名</th>
+					<th scope="col">操作</th>
+				</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+
+
+			<!-- Modal -->
+			<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalCenterTitle">修改用户信息</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<form class="form-signin" action="../Admin/changeAdmin.do" method="post" id="changeAdmin">
+							<div class="modal-body">
+								<div class="form-label-group">
+									<label for="adminnum">编号:</label>
+									<input id="adminnum" name="adminnum" class="form-control" required autofocus autocomplete="off" readonly>
+								</div>
+								<div class="form-label-group">
+									<label for="adminname">用户名:</label>
+									<input id="adminname" name="adminname" class="form-control" required autofocus autocomplete="off" readonly>
+								</div>
+
+								<div class="form-label-group">
+									<label for="password">密码:</label>
+									<input type="password" id="password" name="password" class="form-control" placeholder="输入新密码" onkeyup="validate()" required>
+								</div>
+
+								<div class="form-label-group">
+									<label for="password2">确认密码:</label>
+									<input type="password" id="password2" name="password2" class="form-control" placeholder="确认密码" required onkeyup="validate()"><span id="message"></span>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="submit" class="btn btn-primary" id="changeSub">提交修改</button>
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+							</div>
+
+						</form>
+		</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal -->
+		<div class="modal fade" id="addAdminModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="addUserModalTitle">添加新用户</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<form class="form-signin" action="../Admin/addAdminSub.do" method="post" id="addAdmin">
+						<div class="modal-body">
+							<div class="form-label-group">
+								<label for="newusername">用户名:</label>
+								<input id="newusername" name="adminname" class="form-control" placeholder="用户名" required autofocus autocomplete="off">
+							</div>
+
+							<div class="form-label-group">
+								<label for="password">密码:</label>
+								<input type="password" id="newpassword" name="password" class="form-control" placeholder="密码" onkeyup="addValidate()" required>
+							</div>
+
+							<div class="form-label-group">
+								<label for="password2">确认密码:</label>
+								<input type="password" id="newpassword2" name="password2" class="form-control" placeholder="确认密码" required onkeyup="addValidate()"><span id="addAdminMessage"></span>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-primary" id="addSub">添加新用户</button>
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+						</div>
+
+					</form>
+				</div>
+			</div>
+		</div>
+		<script src="../assets/js/jquery.js"></script>
+		<script src="../assets/js/bootstrap.min.js"></script>
+		<script src="../assets/js/my.js"></script>
+		<script>
+            $(function(){
+                /* $(".mb-4").click(function(){
+                    //$(".alert.alert-success").show().delay(3000).fadeOut();
+                    $(".alert.alert-danger").show().delay(3000).fadeOut();
+                }); */
+
+
+                $.ajax({
+                    url: "../Admin/findAllAdmin.do",	//请求路径
+                    dataType: "json",  //响应的类型 json
+                    success: function(response){	//当响应成功时回调，response响应数据
+                        //遍历 response, i索引，e当前元素
+                        $.each(response,function(i,e){
+                            //向表格中添加数据
+                            let strTrContent = [
+                                '<td scope="row">', e.adminNum, '</td>',
+                                '<td>',e.adminName,'</td>',
+                                '<td>',
+                                '<button class="btn btn-outline-success" data-toggle="modal" data-target="#exampleModalCenter" onclick="change(\'',e.adminNum,'\'\,\'',e.adminName,'\')"><i class="fa fa-pencil"> 修改</i></button>',
+                                '<button class="btn btn-outline-danger del" onclick="del(\'',e.adminName,'\')"><i class="fa fa-trash-o"> 删除</i></button>','</td>']
+                            let $tr = $('<tr>'+strTrContent.join('')+'</tr>')
+                            //在tbody内部 后面追加
+                            $(".table.table-hover tbody").append($tr);
+                        });
+
+                    }
+                });
+
+
+
+            });
+
+            function change(changeAdminId,changeAdminName){
+                $("#adminnum").val(changeAdminId);
+                $("#adminname").val(changeAdminName);
+            }
+
+            function del(delAdminname){
+                $.ajax({
+                    url: "delAdmin/"+delAdminname+".do",//请求路径
+                    dataType: "json",	//响应类型
+                    success: function(response){	//响应成功的回调函数，response响应数据
+                        if(response){
+                            $(".alert.alert-success").show().delay(700).fadeOut();
+                            setTimeout(()=>{window.location.reload()},700)
+                        }else{
+                            $(".alert.alert-danger").show().delay(1000).fadeOut();
+                        }
+                    }
+                });
+
+            }
+            function validate(){
+                var pwd = $("#password").val();
+                var conpwd = $("#password2").val();
+
+                if (pwd==conpwd) {
+                    $("#message").html("两次密码输入相同");
+                    $("#message").css("color","green");
+                    $("#changeSub").removeAttr("disabled")
+                } else {
+                    $("#message").html("两次密码输入不相同");
+                    $("#message").css("color","red");
+                    $("#changeSub").attr("disabled","disabled");
+                }
+            }
+            function addValidate(){
+                var pwd = $("#newpassword").val();
+                var conpwd = $("#newpassword2").val();
+
+                if (pwd==conpwd) {
+                    $("#addAdminMessage").html("两次密码输入相同");
+                    $("#addAdminMessage").css("color","green");
+                    $("#addSub").removeAttr("disabled")
+                } else {
+                    $("#addAdminMessage").html("两次密码输入不相同");
+                    $("#addAdminMessage").css("color","red");
+                    $("#addSub").attr("disabled","disabled");
+                }
+            }
+		</script>
+		<script src="../assets/js/jquery.form.js"></script>
+		<script type="text/javascript">
+			 $(function(){
+        /** 验证文件是否导入成功  */
+        $("#findForm").ajaxForm(function(data) {
+            if (data != "") {
+
+
+                $(".table.table-hover tbody").html("");
+                //遍历 response, i索引，e当前元素
+                $.each(data, function (i, e) {
+                    //向表格中添加数据
+                    let strTrContent = [
+                        '<td scope="row">', e.adminNum, '</td>',
+                        '<td>', e.adminName, '</td>',
+                        '<td>',
+                        '<button class="btn btn-outline-success" data-toggle="modal" data-target="#exampleModalCenter" onclick="change(\'',e.adminNum,'\'\,\'',e.adminName,'\')"><i class="fa fa-pencil"> 修改</i></button>',
+                        '<button class="btn btn-outline-danger del" onclick="del(\'', e.adminName, '\')"><i class="fa fa-trash-o"> 删除</i></button>', '</td>']
+                    let $tr = $('<tr>' + strTrContent.join('') + '</tr>')
+                    //在tbody内部 后面追加
+                    $(".table.table-hover tbody").append($tr);
+                });
+
+
+
+            }else{
+			    alert("无搜索结果！")
+			}
+        });
+    });
+
+		</script>
+		<script type="text/javascript">
+            $(function(){
+                /** 验证文件是否导入成功  */
+                $("#changeAdmin").ajaxForm(function(data){
+                    if(data==true){
+                        alert("修改成功！");
+                        location.href="../Admin/adminList.do";
+                    }else{
+                        alert("修改失败！")
+                    }
+                });
+            });
+            $(function(){
+                /** 验证文件是否导入成功  */
+                $("#addAdmin").ajaxForm(function(data){
+                    if(data==true){
+                        alert("添加成功！");
+                        location.href="../Admin/adminList.do";
+                    }else{
+                        alert("添加失败！用户已存在！")
+                    }
+                });
+            });
+
+		</script>
+	</body>
+
+</html>

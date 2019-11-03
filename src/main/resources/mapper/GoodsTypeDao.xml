@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maple.MapleMall.dao.IGoodsTypeDao">
+    <resultMap id="GoodsTypeMap" type="GoodsType">
+        <id column="goodsTypeId" property="goodsTypeId"/>
+        <result column="goodsTypeNum" property="goodsTypeNum"/>
+        <result column="goodsTypeName" property="goodsTypeName"/>
+        <result column="goodsTypeDel" property="goodsTypeDel"/>
+        <result column="goodsTypeRE" property="goodsTypeRE"/>
+    </resultMap>
+
+    <resultMap id="GoodsTypeAndGoodsMap" type="GoodsType" extends="GoodsTypeMap">
+        <collection property="goods" ofType="Goods">
+            <id column="goodsId" property="goodsId"/>
+            <result column="goodsNum" property="goodsNum"/>
+            <result column="goodsName" property="goodsName"/>
+            <result column="goodsType" property="goodsType"/>
+            <result column="goodsPrice" property="goodsPrice"/>
+            <result column="goodsDel" property="goodsDel"/>
+            <result column="goodsRE" property="goodsRE"/>
+        </collection>
+    </resultMap>
+
+    <select id="findGoodsTypeByName" resultMap="GoodsTypeMap" parameterType="String">
+        select * from t_goodstype
+        where goodsTypeDel=0 and goodsTypeName like concat('%',#{goodsTypeName},'%')
+    </select>
+    <select id="findGoodsTypeAll" resultMap="GoodsTypeMap" parameterType="String">
+        select * from t_goodstype
+        where goodsTypeDel=0
+    </select>
+    <select id="findMaxNum" resultType="String" parameterType="String">
+        select goodsTypeNum from t_goodstype where goodsTypeDel=0
+        and goodsTypeId=(select max(goodsTypeId) from t_goodstype where goodsTypeDel=0)
+    </select>
+
+    <!--<select id="findGoodsByGoodsType" resultMap="GoodsTypeMap" parameterType="String">-->
+        <!--SELECT * from t_goods g,t_goodstype gt-->
+        <!--WHERE g.goodsType=gt.goodsTypeNum and goodsTypeDel=0-->
+          <!--and gt.goodsTypeName=#{goodsTypeName}-->
+    <!--</select>-->
+
+    <insert id="addGoodsType" parameterType="GoodsType">
+        insert into t_goodstype(goodsTypeNum,goodsTypeName,goodsTypeDel)
+            value (#{goodsTypeNum},#{goodsTypeName},#{goodsTypeDel})
+    </insert>
+
+    <update id="deleteGoodsType" parameterType="String">
+        update t_goodstype set goodsTypeDel=1 where goodsTypeDel=0
+        and goodsTypeName=#{goodsTypeName}
+    </update>
+    <update id="updateByNum" parameterType="map">
+        update t_goodstype set goodsTypeName=#{goodsTypeName} where goodsTypeDel=0
+        and goodsTypeNum=#{goodsTypeNum}
+    </update>
+</mapper>

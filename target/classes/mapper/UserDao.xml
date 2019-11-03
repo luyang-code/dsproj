@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	namespace 访问的路径
+	select 查询操作
+	selectTUserByID 自定义的访问名
+	parameterType 传参类型
+	resultType 返回类型 对应了 config.xml中<typeAlias>
+	要执行的SQL语句
+ -->
+<mapper namespace="com.maple.MapleMall.dao.IUserDao">
+    <resultMap type="User" id="userMap">
+        <id column="userId" property="userId"/>
+        <result column="userNum" property="userNum"/>
+        <result column="userName" property="userName"/>
+        <result column="userPassword" property="userPassword"/>
+        <result column="userDel" property="userDel"/>
+    </resultMap>
+
+    <select id="getMaxId" resultType="String">
+        SELECT userNum from t_user where userId=(SELECT max(userId) from t_user where userDel=0)
+    </select>
+
+    <select id="findUserByUsername" parameterType="String" resultMap="userMap">
+        SELECT * from t_user where userName like concat('%',#{userName},'%') and userDel=0
+    </select>
+    <select id="getDBUser" parameterType="String" resultMap="userMap">
+        SELECT * from t_user where userName=#{userName} and userDel=0
+    </select>
+    <select id="findUserByUserNum" parameterType="String" resultMap="userMap">
+        SELECT * from t_user where userNum like concat('%',#{userNum},'%') and userDel=0
+    </select>
+
+    <update id="addUser" parameterType="User" >
+        insert into t_user
+        VALUES(
+                  DEFAULT,#{userNum},#{userName},#{userPassword},0,NULL
+              )
+    </update>
+
+    <update id="deleteUser" parameterType="String">
+        UPDATE t_user set userDel=1 where userNum=#{userNum} and userDel=0
+    </update>
+
+    <update id="updateUser" parameterType="User">
+        UPDATE t_user set userPassword=#{userPassword} where userName=#{userName} and userDel=0
+    </update>
+
+    <select id="findAllUser" resultMap="userMap">
+        select * from t_user where userDel=0
+    </select>
+
+
+
+</mapper>
